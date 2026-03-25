@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .task-item { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .admin-badge { background: gold; padding: 2px 8px; border-radius: 3px; }
+        .task-owner { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Task List</h1>
+    
+    <p>
+        Logged in as: <strong>{{ request.user.username }}</strong>
+        {% if is_admin %}
+            <span class="admin-badge">Admin</span>
+        {% endif %}
+        | <a href="{% url 'logout' %}">Logout</a>
+    </p>
+    
+    <a href="{% url 'task_create' %}">+ Add New Task</a>
+    
+    <ul>
+        {% for task in tasks %}
+            <li class="task-item">
+                <strong>{{ task.title }}</strong>
+                {% if is_admin %}
+                    <span class="task-owner">(Owner: {{ task.user.username }})</span>
+                {% endif %}
+                <br>
+                {{ task.description }}
+                <br>
+                Completed: {{ task.completed | yesno:"Yes,No" }}
+                <br>
+                Created: {{ task.created_at | date:"M d, Y" }}
+                <br>
+                <a href="{% url 'task_update' task.id %}">Edit</a> |
+                <a href="{% url 'task_delete' task.id %}" onclick="return confirm('Are you sure?')">Delete</a>
+            </li>
+        {% empty %}
+            <li>No tasks yet. <a href="{% url 'task_create' %}">Create one!</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
